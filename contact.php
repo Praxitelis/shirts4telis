@@ -36,13 +36,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		}
 
 		$email_body = "";
-		$email_body = $email_body . "Name: " . $name . "\n";
-		$email_body = $email_body . "Email: ". $email . "\n";
+		$email_body = $email_body . "Name: " . $name . "<br>";
+		$email_body = $email_body . "Email: ". $email . "<br>";
 		$email_body = $email_body . "Message: " . $message;
 
 
 
 		// TODO: Send Email
+
+		$mail->SetFrom($email, $name);
+
+		$address = "orders@telisshirts.com";
+		$mail->AddAddress($address, "Shirts 4 Telis");
+
+		$mail->Subject    = "Shirts 4 Telis Contact Form Submission | " . $name;
+
+		$mail->MsgHTML($email_body);
+
+		if(!$mail->Send()) {
+		  echo "There was a problem sending the email: " . $mail->ErrorInfo;
+		  exit;
+		
+		}
+
+
+		//////
+
 		header("Location: contact.php?status=thanks");
 		exit;
 
