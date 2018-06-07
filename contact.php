@@ -7,64 +7,67 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$message = trim($_POST["message"]);
 
 		if ($name == "" OR $email == "" OR $message == "") {
-			echo "You have not entered all required fields!";
-			exit;
+			$error_message = "You have not entered all required fields!";
+			
 		}
 
 		//checks if any content contains malicious values. Code provided by nyphp.org 
-		foreach ($_POST as $value) {
-			if ( stripos($value, 'Content-Type:') !== FALSE){
-				echo "There was a problem with the information you entered.";
-				exit;
+
+		if (!isset($error_message)){
+			foreach ($_POST as $value) {
+				if ( stripos($value, 'Content-Type:') !== FALSE ){
+					$error_message = "There was a problem with the information you entered.";
+					
+				}
 			}
 		}
 
 		// Checks if the hidden field we added for the robots was filed. If it was, then we display an error message
-		if ($_POST["address"] != "") {
-			echo "Your form submission has an error";
-			exit;
+		if (!isset($error_message) && $_POST["address"] != "") {
+			$error_message = "Your form submission has an error";
+			
 
 		}
 
 		require_once("inc/phpmailer/class.phpmailer.php");
 		$mail = new PHPMailer();
 
-		if (!$mail->ValidateAddress($email)) {
+		if (!isset($error_message) && !$mail->ValidateAddress($email)) {
 
-			echo "You must specify a valid email address.";
-			exit;
+			$error_message = "You must specify a valid email address.";
+			
 		}
 
-		$email_body = "";
-		$email_body = $email_body . "Name: " . $name . "<br>";
-		$email_body = $email_body . "Email: ". $email . "<br>";
-		$email_body = $email_body . "Message: " . $message;
+		//////Checks if there is an error
+		if (!isset($error_message)) {
+
+			$email_body = "";
+			$email_body = $email_body . "Name: " . $name . "<br>";
+			$email_body = $email_body . "Email: ". $email . "<br>";
+			$email_body = $email_body . "Message: " . $message;
 
 
 
-		// TODO: Send Email
+			// TODO: Send Email
 
-		$mail->SetFrom($email, $name);
+			$mail->SetFrom($email, $name);
 
-		$address = "orders@telisshirts.com";
-		$mail->AddAddress($address, "Shirts 4 Telis");
+			$address = "orders@telisshirts.com";
+			$mail->AddAddress($address, "Shirts 4 Telis");
 
-		$mail->Subject    = "Shirts 4 Telis Contact Form Submission | " . $name;
+			$mail->Subject    = "Shirts 4 Telis Contact Form Submission | " . $name;
 
-		$mail->MsgHTML($email_body);
+			$mail->MsgHTML($email_body);
 
-		if(!$mail->Send()) {
-		  echo "There was a problem sending the email: " . $mail->ErrorInfo;
-		  exit;
-		
+			if($mail->Send()) {
+				header("Location: contact.php?status=thanks");
+				exit;
+			} else {
+			  $error_message = "There was a problem sending the email: " . $mail->ErrorInfo;
+			}
+			  
+			
 		}
-
-
-		//////
-
-		header("Location: contact.php?status=thanks");
-		exit;
-
 
 }
 
@@ -87,7 +90,13 @@ include('inc/header.php'); ?>
 
 			<?php } else { ?>
 
-					<p>I&rsquo;d love to hear from you! Complete the form to send me an email.</p>
+					<?php 
+					if (!isset($error_message)) {
+						echo '<p>I&rsquo;d love to hear from you! Complete the form to send me an email.</p>';
+					} else {
+						echo '<p class="message">' . $error_message . '</p>';
+
+					} ?>
 
 					<form method="post" action="contact.php">
 
