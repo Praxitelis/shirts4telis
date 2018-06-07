@@ -108,7 +108,7 @@ include('inc/header.php'); ?>
 								</th>
 
 								<td>
-									<input type="text" name="name" id="name">
+									<input type="text" name="name" id="name" value=" <?php if (isset($name)) { echo $name; } ?>">
 								</td>
 
 							</tr>
@@ -118,7 +118,7 @@ include('inc/header.php'); ?>
 								</th>
 
 								<td>
-									<input type="text" name="email" id="email">
+									<input type="text" name="email" id="email" value=" <?php if (isset($message)) { echo $email; } ?>">
 								</td>
 
 							</tr>
@@ -128,7 +128,7 @@ include('inc/header.php'); ?>
 								</th>
 
 								<td>
-									<textarea name="message" id="message"></textarea>
+									<textarea name="message" id="message" ><?php if (isset($message)) { echo $message; } ?></textarea>
 								</td>
 
 							</tr>
